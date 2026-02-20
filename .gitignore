@@ -1,0 +1,22 @@
+# match compilation directories
+platforms/
+linux64*/
+.vscode/
+
+# match runtime directories excluding initial directories
+dynamicCode/
+postProcessing/
+processor*/
+[0-9]*/
+!0/
+!0?orig/
+
+# match unnecessary run folders
+
+
+# match log files
+log.*
+
+# match results directory and files
+results
+*.png
