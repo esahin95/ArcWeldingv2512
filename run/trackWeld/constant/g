@@ -9,46 +9,13 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       dictionary;
-    object      phaseProperties;
+    class       uniformDimensionedVectorField;
+    object      g;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-type    massTransferMultiphaseSystem;
+dimensions      [0 1 -2 0 0 0 0];
+value           (0 0 -9.81);
 
-phases  (liquid gas);
-
-liquid
-{
-    type            pureMovingPhaseModel;
-}
-
-gas
-{
-    type            pureMovingPhaseModel;
-}
-
-surfaceTension
-(
-    (gas and liquid)
-    {
-        type            temperatureDependent;
-        sigma
-        {
-            type    table;
-            values
-            (
-                (200 0.02)
-                (400 0.0)
-            );
-            outOfBounds         clamp;
-            interpolationScheme linear;
-        }
-    }
-);
-
-massTransferModel
-(
-);
 
 // ************************************************************************* //

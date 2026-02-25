@@ -9,46 +9,30 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       dictionary;
-    object      phaseProperties;
+    class       volScalarField;
+    object      p_rgh;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-type    massTransferMultiphaseSystem;
+dimensions      [1 -1 -2 0 0 0 0];
 
-phases  (liquid gas);
+internalField   uniform 1e5;
 
-liquid
+boundaryField
 {
-    type            pureMovingPhaseModel;
-}
-
-gas
-{
-    type            pureMovingPhaseModel;
-}
-
-surfaceTension
-(
-    (gas and liquid)
+    zmax 
     {
-        type            temperatureDependent;
-        sigma
-        {
-            type    table;
-            values
-            (
-                (200 0.02)
-                (400 0.0)
-            );
-            outOfBounds         clamp;
-            interpolationScheme linear;
-        }
+        type            prghTotalPressure;
+        p0              $internalField;
+        value           $internalField;
     }
-);
 
-massTransferModel
-(
-);
+    "(zmin|xmin|xmax|ymin|ymax)"
+    {
+        type            fixedFluxPressure;
+        value           $internalField;
+    }
+}
+
 
 // ************************************************************************* //

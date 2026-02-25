@@ -10,45 +10,55 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
-    object      phaseProperties;
+    object      fvSchemes;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-type    massTransferMultiphaseSystem;
-
-phases  (liquid gas);
-
-liquid
+ddtSchemes
 {
-    type            pureMovingPhaseModel;
+    default     Euler;
 }
 
-gas
+gradSchemes
 {
-    type            pureMovingPhaseModel;
+    default     Gauss linear;
 }
 
-surfaceTension
-(
-    (gas and liquid)
-    {
-        type            temperatureDependent;
-        sigma
-        {
-            type    table;
-            values
-            (
-                (200 0.02)
-                (400 0.0)
-            );
-            outOfBounds         clamp;
-            interpolationScheme linear;
-        }
-    }
-);
+divSchemes
+{
+    default                 none;
+    
+    div(rhoPhi,U)           Gauss limitedLinear 1;
 
-massTransferModel
-(
-);
+    "div\(phi,alpha.*\)"    Gauss vanLeer;
+    "div\(phir,alpha.*\)"   Gauss linear;
+
+    div(((rho*nuEff)*dev2(T(grad(U))))) Gauss linear;
+
+    div(phi,T)              Gauss limitedLinear 1;
+}
+
+laplacianSchemes
+{
+    default             Gauss linear corrected;
+}
+
+interpolationSchemes
+{
+    default         linear;
+}
+
+snGradSchemes
+{
+    default         corrected;
+}
+
+fluxRequired
+{
+    default         no;
+    p_rgh             ;
+    "alpha.*"         ;
+}
+
 
 // ************************************************************************* //

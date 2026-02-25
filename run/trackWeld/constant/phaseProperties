@@ -16,7 +16,12 @@ FoamFile
 
 type    massTransferMultiphaseSystem;
 
-phases  (liquid gas);
+phases  (solid liquid gas);
+
+solid 
+{
+    type            pureStaticSolidPhaseModel;
+}
 
 liquid
 {
@@ -32,23 +37,47 @@ surfaceTension
 (
     (gas and liquid)
     {
-        type            temperatureDependent;
-        sigma
-        {
-            type    table;
-            values
-            (
-                (200 0.02)
-                (400 0.0)
-            );
-            outOfBounds         clamp;
-            interpolationScheme linear;
-        }
+        type            constant;
+        sigma           0.07;
+    }
+    (gas and solid)
+    {
+        type            constant;
+        sigma           0.0;
+    }
+    (solid and liquid)
+    {
+        type            constant;
+        sigma           0.0;
     }
 );
 
+interfacePorous
+(
+    (solid and liquid)
+    {
+        type            VollerPrakash;
+        solidPhase      alpha.solid;
+        Cu              0e12;
+    }
+);
+
+
 massTransferModel
 (
+    (solid to liquid)
+    {
+        type            Lee;
+        C               200;
+        Tactivate       1710;
+    }
+    (liquid to solid)
+    {
+        type            Lee;
+        C               -200;
+        Tactivate       1710;
+    }
 );
+
 
 // ************************************************************************* //

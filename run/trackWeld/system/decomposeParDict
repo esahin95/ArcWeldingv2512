@@ -10,45 +10,15 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
-    object      phaseProperties;
+    object      decomposeParDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-type    massTransferMultiphaseSystem;
+numberOfSubdomains 4;
 
-phases  (liquid gas);
+method          scotch;
 
-liquid
-{
-    type            pureMovingPhaseModel;
-}
+distributed     no;
 
-gas
-{
-    type            pureMovingPhaseModel;
-}
-
-surfaceTension
-(
-    (gas and liquid)
-    {
-        type            temperatureDependent;
-        sigma
-        {
-            type    table;
-            values
-            (
-                (200 0.02)
-                (400 0.0)
-            );
-            outOfBounds         clamp;
-            interpolationScheme linear;
-        }
-    }
-);
-
-massTransferModel
-(
-);
 
 // ************************************************************************* //

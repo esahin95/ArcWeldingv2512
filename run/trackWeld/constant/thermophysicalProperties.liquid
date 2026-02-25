@@ -10,45 +10,43 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
-    object      phaseProperties;
+    object      thermophysicalProperties.liquid;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-type    massTransferMultiphaseSystem;
-
-phases  (liquid gas);
-
-liquid
+thermoType
 {
-    type            pureMovingPhaseModel;
+    type            heRhoThermo;
+    mixture         pureMixture;
+    transport       const;
+    thermo          hConst;
+    equationOfState rhoConst;
+    specie          specie;
+    energy          sensibleEnthalpy;
 }
 
-gas
+mixture
 {
-    type            pureMovingPhaseModel;
-}
-
-surfaceTension
-(
-    (gas and liquid)
+    specie
     {
-        type            temperatureDependent;
-        sigma
-        {
-            type    table;
-            values
-            (
-                (200 0.02)
-                (400 0.0)
-            );
-            outOfBounds         clamp;
-            interpolationScheme linear;
-        }
+        nMoles          1;
+        molWeight       55;
     }
-);
+    equationOfState
+    {
+        rho             6501;
+    }
+    thermodynamics
+    {
+        Cp              770;
+        Hf              267776.0;
+    }
+    transport
+    {
+        mu              0.002;
+        Pr              0.077;
+    }
+}
 
-massTransferModel
-(
-);
 
 // ************************************************************************* //

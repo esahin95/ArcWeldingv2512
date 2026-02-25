@@ -10,45 +10,29 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
-    object      phaseProperties;
+    object      setFieldsDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-type    massTransferMultiphaseSystem;
-
-phases  (liquid gas);
-
-liquid
-{
-    type            pureMovingPhaseModel;
-}
-
-gas
-{
-    type            pureMovingPhaseModel;
-}
-
-surfaceTension
+defaultFieldValues
 (
-    (gas and liquid)
+    volScalarFieldValue alpha.gas 1
+    volScalarFieldValue alpha.liquid 0
+    volScalarFieldValue alpha.solid 0
+);
+
+regions
+(
+    boxToCell
     {
-        type            temperatureDependent;
-        sigma
-        {
-            type    table;
-            values
-            (
-                (200 0.02)
-                (400 0.0)
-            );
-            outOfBounds         clamp;
-            interpolationScheme linear;
-        }
+        box (-1 -1 -1) (1 1 0);
+        fieldValues
+        (
+            volScalarFieldValue alpha.solid 1
+            volScalarFieldValue alpha.gas 0
+        );
     }
 );
 
-massTransferModel
-(
-);
 
 // ************************************************************************* //
