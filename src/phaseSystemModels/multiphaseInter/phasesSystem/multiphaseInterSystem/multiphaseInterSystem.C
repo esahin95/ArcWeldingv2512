@@ -1087,12 +1087,6 @@ Foam::multiphaseInterSystem::surfaceTensionForce() const
     auto& stf = tstf.ref();
     stf.setOriented();
 
-    const dimensionedScalar deltaN
-    (
-        "deltaN",
-        1e-8/cbrt(average(mesh_.V()))
-    );
-
     if (surfaceTensionModels_.size())
     {
         forAllConstIters(phaseModels_, iter1)
@@ -1105,46 +1099,36 @@ Foam::multiphaseInterSystem::surfaceTensionForce() const
             {
                 const volScalarField& alpha2 = iter2()();
 
-                const volScalarField sigma
+                DebugInfo<< "Adding surface force for pair " << alpha1.name() << " and " << alpha2.name() << endl;
+
+                stf +=
                 (
-                    surfaceTensionCoeff
+                    fvc::interpolate
                     (
-                        phasePairKey(iter1()->name(), iter2()->name())
+                        surfaceTensionCoeff
+                        (
+                            phasePairKey(iter1()->name(), iter2()->name())
+                        )
+                    )
+                  * fvc::interpolate(K(alpha1, alpha2))
+                  * (
+                        fvc::interpolate(alpha2) * fvc::snGrad(alpha1)
+                      - fvc::interpolate(alpha1) * fvc::snGrad(alpha2)
+                    )
+                  + (
+                        (
+                            fvc::interpolate(fvc::grad(surfaceTensionCoeff(phasePairKey(iter1()->name(), iter2()->name())))) 
+                          - (fvc::interpolate(fvc::grad(surfaceTensionCoeff(phasePairKey(iter1()->name(), iter2()->name())))) & nHatfv(alpha1, alpha2)) * nHatfv(alpha1, alpha2)
+                        ) & mesh_.Sf()
+                    ) / mesh_.magSf()
+                  * (
+                        fvc::interpolate(alpha2) 
+                      * (
+                            mag(fvc::interpolate(fvc::grad(alpha1)))
+                          + mag(fvc::interpolate(fvc::grad(alpha2)))
+                        ) 
                     )
                 );
-
-                const volScalarField alpha1b
-                (
-                    clamp(alpha1, zero_one{})
-                );
-
-                const volScalarField alpha2b
-                (
-                    clamp(alpha2, zero_one{})
-                );
-
-                const surfaceVectorField gradAlphaf
-                (
-                    fvc::interpolate(alpha2b)*fvc::interpolate(fvc::grad(alpha1b))
-                  - fvc::interpolate(alpha1b)*fvc::interpolate(fvc::grad(alpha2b))
-                );
-
-                const surfaceVectorField nHatfv
-                (
-                    gradAlphaf / (mag(gradAlphaf) + deltaN)
-                );
-
-                const surfaceScalarField snGradAlphaf 
-                (
-                    fvc::interpolate(alpha2b)*fvc::snGrad(alpha1b)
-                  - fvc::interpolate(alpha1b)*fvc::snGrad(alpha2b)
-                );
-
-                // Standard surface tension force
-                stf += fvc::interpolate(-sigma * fvc::div(nHatfv & mesh_.Sf())) * snGradAlphaf;
-
-                // Marangoni surface force contribution
-                stf += mag(gradAlphaf) * fvc::snGrad(sigma) - (fvc::interpolate(fvc::grad(sigma)) & nHatfv) * snGradAlphaf;
             }
         }
     }

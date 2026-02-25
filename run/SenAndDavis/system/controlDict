@@ -22,13 +22,13 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         0.05;
+endTime         0.5;
 
 deltaT          1e-5;
 
 writeControl    adjustable;
 
-writeInterval   0.005;
+writeInterval   0.05;
 
 purgeWrite      0;
 
@@ -57,6 +57,11 @@ maxAlphaDdt     2.3; // Check this
 maxDi           25; // Check this
 
 // ************************************************************************* //
+
+DebugSwitches
+{
+    multiphaseInterSystem 1;
+}
 
 OptimisationSwitches
 {
@@ -92,5 +97,41 @@ functions
         mode       magnitude;
 
         fields (p_rgh U T divU);
+    }
+
+    lineUniform
+    {
+        type            sets;
+
+        libs            (sampling);
+
+        writeControl    writeTime;
+
+        interpolationScheme cellPointFace;
+
+        setFormat       csv;
+
+        fields          (alpha.liquid);
+
+        sets
+        (
+            left
+            {
+                type            uniform;
+                axis            distance;
+                start           (1e-7 0.0 5e-5);
+                end             (1e-7 5e-4 5e-5);
+                nPoints         360;
+            }
+
+            right
+            {
+                type            uniform;
+                axis            distance;
+                start           (0.9999e-3 0.0 5e-5);
+                end             (0.9999e-3 5e-4 5e-5);
+                nPoints         360;
+            }
+        );
     }
 }
