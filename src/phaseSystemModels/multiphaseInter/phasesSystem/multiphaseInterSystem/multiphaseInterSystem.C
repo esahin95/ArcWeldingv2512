@@ -1105,12 +1105,19 @@ Foam::multiphaseInterSystem::surfaceTensionForce() const
             {
                 const volScalarField& alpha2 = iter2()();
 
+                DebugInfo<< "Adding surface force for pair " << alpha1.name() << " and " << alpha2.name() << endl;
+
                 const volScalarField sigma
                 (
                     surfaceTensionCoeff
                     (
                         phasePairKey(iter1()->name(), iter2()->name())
                     )
+                );
+
+                const surfaceVectorField gradSigmaf
+                (
+                    fvc::interpolate(fvc::grad(sigma))
                 );
 
                 const volScalarField alpha1b
@@ -1129,22 +1136,25 @@ Foam::multiphaseInterSystem::surfaceTensionForce() const
                   - fvc::interpolate(alpha1b)*fvc::interpolate(fvc::grad(alpha2b))
                 );
 
-                const surfaceVectorField nHatfv
+                const surfaceVectorField n
                 (
                     gradAlphaf / (mag(gradAlphaf) + deltaN)
                 );
 
-                const surfaceScalarField snGradAlphaf 
+                const surfaceScalarField corrf 
+                (
+                    fvc::interpolate(scalar(2) * (alpha1b * iter1()->rho() + alpha2b * iter2()->rho()) / (iter1()->rho() + iter2()->rho()) / (alpha1b + alpha2b + deltaN.value()))
+                );
+
+                // Standard surface tension force
+                stf += fvc::interpolate(sigma * K(alpha1, alpha2)) * 
                 (
                     fvc::interpolate(alpha2b)*fvc::snGrad(alpha1b)
                   - fvc::interpolate(alpha1b)*fvc::snGrad(alpha2b)
                 );
 
-                // Standard surface tension force
-                stf += fvc::interpolate(-sigma * fvc::div(nHatfv & mesh_.Sf())) * snGradAlphaf;
-
                 // Marangoni surface force contribution
-                stf += mag(gradAlphaf) * fvc::snGrad(sigma) - (fvc::interpolate(fvc::grad(sigma)) & nHatfv) * snGradAlphaf;
+                stf += ((gradSigmaf - (gradSigmaf & n) * n) & (mesh_.Sf() / mesh_.magSf())) * mag(gradAlphaf) * corrf;
             }
         }
     }

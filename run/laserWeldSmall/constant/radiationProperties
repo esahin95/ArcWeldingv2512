@@ -34,7 +34,6 @@ focalLaserRadius 10e-6;
 
 laserPower 10;
 
-
 reflectionModel 
 (
     (gas and liquid)
@@ -51,14 +50,13 @@ reflectionModel
     }
 );
 
-
 absorptionEmissionModel localDensityAbsorptionEmission;
 
 localDensityAbsorptionEmissionCoeffs
 {
     alphaNames (alpha.gas alpha.liquid alpha.solid);
-    aCoeff (0 1e+10 1e+10);
-    eCoeff (0 0 0);
+    aCoeff (0 1e+8 1e+8);
+    eCoeff (100 0 0);
     ECoeff (0 0 0);
 }
 

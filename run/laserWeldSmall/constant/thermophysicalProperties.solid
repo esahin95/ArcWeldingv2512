@@ -14,7 +14,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-/*
+
 thermoType
 {
     type            heSolidThermo;
@@ -40,15 +40,15 @@ mixture
     thermodynamics
     {
         Cp              770;
-        Hf              0;
+        Hf              -267776.0;
     }
     transport
     {
         kappa           20.1;
     }
 }
-*/
 
+/*
 thermoType
 {
     type            heRhoThermo;
@@ -82,5 +82,6 @@ mixture
         Pr              0.077;
     }
 }
+*/
 
 // ************************************************************************* //

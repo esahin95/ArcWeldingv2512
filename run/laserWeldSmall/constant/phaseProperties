@@ -20,7 +20,7 @@ phases  (solid liquid gas);
 
 solid 
 {
-    type            pureMovingPhaseModel;//pureStaticSolidPhaseModel;
+    type            pureStaticSolidPhaseModel;
 }
 
 liquid
@@ -58,7 +58,7 @@ interfacePorous
     {
         type            VollerPrakash;
         solidPhase      alpha.solid;
-        Cu              0e12;
+        Cu              1e6;
     }
 );
 

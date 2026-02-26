@@ -12,8 +12,8 @@ restore0Dir
 runApplication blockMesh
 
 # Select powder bed for refinement
-runApplication topoSet
-runApplication refineMesh -overwrite
+#runApplication topoSet
+#runApplication refineMesh -overwrite
 
 # Check mesh quality
 runApplication checkMesh
