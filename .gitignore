@@ -20,3 +20,5 @@ log.*
 # match results directory and files
 results
 *.png
+*.obj
+*.pvsm
