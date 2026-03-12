@@ -1,0 +1,67 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2512                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      radiationProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+radiationModel  laserDTRM;
+
+mode Gaussian;
+
+sigma 5e-6;
+
+nTheta 20;
+
+nr 20;
+
+focalLaserPosition table
+(
+    (  0e-6 (50e-6  20e-6 60e-6))
+    (100e-6 (50e-6 130e-6 60e-6))
+);
+
+laserDirection constant (0 0 -1);
+
+focalLaserRadius 15e-6;
+
+laserPower 10;
+
+reflectionModel
+(
+    (gas to steel)
+    {
+        type    FresnelLaser;
+
+        epsilon 0.08;
+    }
+    (gas to copper)
+    {
+        type    FresnelLaser;
+
+        epsilon 0.08;
+    }
+);
+
+absorptionEmissionModel localDensityAbsorptionEmission;
+
+localDensityAbsorptionEmissionCoeffs
+{
+    alphaNames (alpha.steel alpha.copper alpha.gas);
+    aCoeff (5e+5 5e+5 0);
+    eCoeff (0 0 0);
+    ECoeff (0 0 0);
+}
+
+scatterModel    none;
+
+// ************************************************************************* //

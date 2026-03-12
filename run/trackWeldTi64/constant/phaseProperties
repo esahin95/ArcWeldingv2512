@@ -37,8 +37,18 @@ surfaceTension
 (
     (gas and liquid)
     {
-        type            constant;
-        sigma           0.07;
+        type            temperatureDependent;
+        sigma           
+        {
+            type    table;
+            values
+            (
+                (1933 1.493)
+                (3133 1.265)
+            );
+            outOfBounds         clamp;
+            interpolationScheme linear;
+        }
     }
     (gas and solid)
     {
@@ -58,7 +68,7 @@ interfacePorous
     {
         type            VollerPrakash;
         solidPhase      alpha.solid;
-        Cu              1e6;
+        Cu              1.5e+6;
     }
 );
 
@@ -68,14 +78,14 @@ massTransferModel
     (solid to liquid)
     {
         type            Lee;
-        C               200;
-        Tactivate       1710;
+        C               3.25e+6;
+        Tactivate       1933;
     }
     (liquid to solid)
     {
         type            Lee;
-        C               -200;
-        Tactivate       1710;
+        C               -0.75e+5;
+        Tactivate       1933;
     }
 );
 

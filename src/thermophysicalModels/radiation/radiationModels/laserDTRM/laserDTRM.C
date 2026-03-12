@@ -145,6 +145,7 @@ void Foam::radiation::laserDTRM::initialiseReflection()
         forAllConstIters(modelDicts, iter)
         {
             const phasePairKey& key = iter.key();
+            DebugInfo << "Generating reflection model for: " << key << endl;
 
             reflections_.insert
             (

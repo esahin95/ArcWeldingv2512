@@ -16,41 +16,41 @@ FoamFile
 
 radiationModel  laserDTRM;
 
-mode uniform;
+mode Gaussian;
 
-nTheta 20;
+sigma 15e-6;
+
+nTheta 30;
 
 nr 20;
 
 focalLaserPosition table
 (
-    (  0e-6 (50e-6  20e-6 60e-6))
-    (100e-6 (50e-6 130e-6 60e-6))
+    (  0e-6 ( 100e-6 300e-6 100e-6))
+    (800e-6 (1100e-6 300e-6 100e-6))
 );
 
 laserDirection constant (0 0 -1);
 
-focalLaserRadius 10e-6;
+focalLaserRadius 45e-6;
 
-laserPower 10;
+laserPower 250;
 
 reflectionModel
 (
-    (gas and liquid)
+    (gas to liquid)
     {
         type    FresnelLaser;
 
-        epsilon 0.08;
+        epsilon 0.67;
     }
-    (gas and solid)
+    (gas to solid)
     {
         type    FresnelLaser;
 
-        epsilon 0.08;
+        epsilon 0.67;
     }
 );
-
-alphaCut    0.8;
 
 absorptionEmissionModel localDensityAbsorptionEmission;
 
@@ -63,7 +63,5 @@ localDensityAbsorptionEmissionCoeffs
 }
 
 scatterModel    none;
-
-transmissionModel none;
 
 // ************************************************************************* //

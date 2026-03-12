@@ -1,0 +1,55 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2512                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      setFieldsDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+defaultFieldValues
+(
+    volScalarFieldValue alpha.gas 1
+    volScalarFieldValue alpha.steel 0
+    volScalarFieldValue alpha.steelMelt 0
+    volScalarFieldValue alpha.copper 0
+    volScalarFieldValue alpha.copperMelt 0
+);
+
+regions
+(
+    boxToCell
+    {
+        box (-1 -1 -1) (1 1 0);
+        fieldValues
+        (
+            volScalarFieldValue alpha.steel 1
+            volScalarFieldValue alpha.copper 0
+            volScalarFieldValue alpha.gas 0
+        );
+    }
+
+    spheresToCell
+    {
+        data 
+        (
+            #include "powderBed"
+        );
+        fieldValues
+    	(
+            volScalarFieldValue alpha.copper 1
+            volScalarFieldValue alpha.steel 0
+            volScalarFieldValue alpha.gas 0
+    	);
+    }
+);
+
+
+// ************************************************************************* //

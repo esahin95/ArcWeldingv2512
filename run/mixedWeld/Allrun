@@ -1,0 +1,29 @@
+#!/bin/sh
+cd "${0%/*}" || exit                                # Run from this directory
+. ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions        # Tutorial run functions
+#------------------------------------------------------------------------------
+
+# Dynamic code
+canCompile || exit 0
+
+restore0Dir
+
+# Generate the base block mesh
+runApplication blockMesh
+
+# Select powder bed for refinement
+runApplication topoSet
+runApplication refineMesh -overwrite
+
+# Check mesh quality
+runApplication checkMesh
+
+# Set initial field values
+runApplication setFields
+
+# run in parallel
+runApplication decomposePar -cellDist
+runParallel $(getApplication)
+runApplication reconstructPar
+
+#------------------------------------------------------------------------------

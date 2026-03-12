@@ -31,57 +31,21 @@ mixture
     specie
     {
         nMoles          1;
-        molWeight       55;
+        molWeight       46.7;
     }
     equationOfState
     {
-        rho             6501;
+        rho             4430;
     }
     thermodynamics
     {
-        Cp              770;
-        Hf              -267776.0;
+        Cp              820;
+        Hf              -2.83e+5;
     }
     transport
     {
-        kappa           20.1;
+        kappa           27.5;
     }
 }
-
-/*
-thermoType
-{
-    type            heRhoThermo;
-    mixture         pureMixture;
-    transport       const;
-    thermo          hConst;
-    equationOfState rhoConst;
-    specie          specie;
-    energy          sensibleEnthalpy;
-}
-
-mixture
-{
-    specie
-    {
-        nMoles          1;
-        molWeight       55;
-    }
-    equationOfState
-    {
-        rho             6501;
-    }
-    thermodynamics
-    {
-        Cp              770;
-        Hf              0.0;
-    }
-    transport
-    {
-        mu              0.002;
-        Pr              0.077;
-    }
-}
-*/
 
 // ************************************************************************* //

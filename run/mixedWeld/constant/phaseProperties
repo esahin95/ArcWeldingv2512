@@ -1,0 +1,162 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2512                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      phaseProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+type    massTransferMultiphaseSystem;
+
+phases  (steel steelMelt copper copperMelt gas);
+
+steel 
+{
+    type            pureStaticSolidPhaseModel;
+}
+
+steelMelt
+{
+    type            pureMovingPhaseModel;
+}
+
+copper 
+{
+    type            pureStaticSolidPhaseModel;
+}
+
+copperMelt
+{
+    type            pureMovingPhaseModel;
+}
+
+gas
+{
+    type            multiComponentMovingPhaseModel;
+}
+
+surfaceTension
+(
+    (gas and steel)
+    {
+        type            constant;
+        sigma           0.0;
+    }
+    (gas and copper)
+    {
+        type            constant;
+        sigma           0.0;
+    }
+    (gas and copperMelt)
+    {
+        type            constant;
+        sigma           0.07;
+    }
+    (gas and steelMelt)
+    {
+        type            constant;
+        sigma           0.07;
+    }
+    (steel and copper)
+    {
+        type            constant;
+        sigma           0.0;
+    }
+    (steelMelt and steel)
+    {
+        type            constant;
+        sigma           0.0;
+    }
+    (steelMelt and copper)
+    {
+        type            constant;
+        sigma           0.0;
+    }
+    (copperMelt and steel)
+    {
+        type            constant;
+        sigma           0.0;
+    }
+    (copperMelt and copper)
+    {
+        type            constant;
+        sigma           0.0;
+    }
+    (copperMelt and steelMelt)
+    {
+        type            constant;
+        sigma           0.0;
+    }
+);
+
+interfacePorous
+(
+    (steel and steelMelt)
+    {
+        type            VollerPrakash;
+        solidPhase      alpha.steel;
+        Cu              1e6;
+    }
+    (copper and copperMelt)
+    {
+        type            VollerPrakash;
+        solidPhase      alpha.copper;
+        Cu              1e6;
+    }
+);
+
+
+massTransferModel
+(
+    (steelMelt to gas)
+    {
+        type            kineticGasEvaporation;
+        species         steel.gas;
+        C               0.1;
+        isoAlpha        0.1;
+        Tactivate       3000;
+    }
+    (copperMelt to gas)
+    {
+        type            kineticGasEvaporation;
+        species         copper.gas;
+        C               0.1;
+        isoAlpha        0.1;
+        Tactivate       3000;
+    }
+    (steel to steelMelt)
+    {
+        type            Lee;
+        C               3.25e+6;
+        Tactivate       1710;
+    }
+    (steelMelt to steel)
+    {
+        type            Lee;
+        C               -0.75e+5;
+        Tactivate       1710;
+    }
+    (copper to copperMelt)
+    {
+        type            Lee;
+        C               3.25e+6;
+        Tactivate       1710;
+    }
+    (copperMelt to copper)
+    {
+        type            Lee;
+        C               -0.75e+5;
+        Tactivate       1710;
+    }
+);
+
+
+// ************************************************************************* //

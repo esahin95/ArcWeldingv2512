@@ -68,13 +68,13 @@ massTransferModel
     (solid to liquid)
     {
         type            Lee;
-        C               200;
+        C               3.25e+6;
         Tactivate       1710;
     }
     (liquid to solid)
     {
         type            Lee;
-        C               -200;
+        C               -0.75e+5;
         Tactivate       1710;
     }
 );

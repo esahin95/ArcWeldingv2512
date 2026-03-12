@@ -22,13 +22,13 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         5e-6;
+endTime         800e-6;
 
 deltaT          1e-7;
 
 writeControl    adjustable;
 
-writeInterval   1e-6;
+writeInterval   10e-6;
 
 purgeWrite      0;
 
@@ -52,9 +52,9 @@ maxCo           0.2;
 
 maxAlphaCo      0.2;
 
-maxAlphaDdt     0.2; // Check this
+maxAlphaDdt     0.2;
 
-maxDi           0.2; // Check this
+maxDi           0.2;
 
 libs 
 (
@@ -64,7 +64,6 @@ libs
 DebugSwitches
 {
     laserDTRM   1;
-    DTRMParticle 1;
 }
 
 // ************************************************************************* //

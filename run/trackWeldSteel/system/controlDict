@@ -14,7 +14,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-application     icoReactingMultiphaseInterFoamCorr;
+application     icoReactingMultiphaseInterFoam;
 
 startFrom       latestTime;
 
@@ -22,7 +22,7 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         5e-6;
+endTime         50e-6;
 
 deltaT          1e-7;
 
