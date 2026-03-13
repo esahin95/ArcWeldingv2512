@@ -20,9 +20,9 @@ startFrom       latestTime;
 
 startTime       0;
 
-stopAt          nextWrite;
+stopAt          endTime;
 
-endTime         800e-6;
+endTime         260e-6;
 
 deltaT          1e-7;
 
@@ -54,23 +54,18 @@ maxAlphaCo      0.2;
 
 maxAlphaDdt     0.2;
 
-maxDi           0.2;
+maxDi           20;
 
 libs 
 (
-    spheresToCell
+    gaussianHeatSource
 );
-
-DebugSwitches
-{
-    laserDTRM   1;
-}
 
 // ************************************************************************* //
 
-OptimisationSwitches
+DebugSwitches
 {
-    fileHandler collated;
+    gaussianHeatSource  1;
 }
 
 functions
