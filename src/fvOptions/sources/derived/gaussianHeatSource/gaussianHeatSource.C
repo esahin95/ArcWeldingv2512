@@ -128,7 +128,7 @@ void Foam::fv::gaussianHeatSource::addSup
     forAll(Qv_, cellI)
     {
         // Distance to source
-        const vector x(mesh_.C()[cellI]);
+        const vector x(mesh_.C()[cellI] - pos_);
         const vector d(x - (x&d_)*d_);
         const scalar r(mag(d));
 

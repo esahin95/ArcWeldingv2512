@@ -21,6 +21,5 @@ runApplication setFields
 runApplication decomposePar -cellDist
 runParallel $(getApplication)
 runApplication reconstructPar
-#runApplication $(getApplication)
 
 #------------------------------------------------------------------------------

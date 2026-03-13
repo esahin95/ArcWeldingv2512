@@ -1,0 +1,40 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2512                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      refineMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+set             initPowderBed;
+
+coordinateSystem global;
+
+globalCoeffs
+{
+    e1              (1 0 0);
+    e2              (0 1 0);
+}
+
+directions
+(
+    e1
+    e2
+    e3
+);
+
+useHexTopology  yes;
+
+geometricCut    no;
+
+writeMesh       no;
+
+// ************************************************************************* //

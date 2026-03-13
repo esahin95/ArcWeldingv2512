@@ -68,6 +68,11 @@ DebugSwitches
     gaussianHeatSource  1;
 }
 
+OptimisationSwitches
+{
+    fileHandler collated;
+}
+
 functions
 {
     divU
