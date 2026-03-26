@@ -1,0 +1,97 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2512                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      T;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 0 0 1 0 0 0];
+
+internalField   #codeStream
+{
+    codeInclude
+    #{
+        #include "fvMesh.H"
+        #include "volFields.H"
+    #};
+
+    codeOptions
+    #{
+        -I$(LIB_SRC)/finiteVolume/lnInclude \
+        -I$(LIB_SRC)/meshTools/lnInclude
+    #};
+    
+    codeLibs
+    #{
+        -lmeshTools \
+        -lfiniteVolume
+    #};
+
+    code
+    #{
+        const IOdictionary& d = static_cast<const IOdictionary&>(dict);
+        const fvMesh& mesh = refCast<const fvMesh>(d.db());
+
+        scalar lx = 0.015;
+        scalar dT = 12.0;
+        scalar T0 = 546.55;
+
+        scalarField T(mesh.nCells(), 0.0);
+        scalarField X(mesh.C().component(0));
+        forAll(T, cellI)
+        {
+            T[cellI] = T0 + (0.5 * lx - X[cellI]) / lx * dT;
+        }
+
+        T.writeEntry("", os);
+    #};
+};
+
+boundaryField
+{
+    top
+    {
+        type           inletOutlet;
+        inletValue     $internalField;
+        value          $internalField;
+    }
+
+    left
+    {
+        type           fixedValue;
+        value          uniform 540.55;
+    }
+
+    right
+    {
+        type           fixedValue;
+        value          uniform 552.55;
+    }
+
+    bottom
+    {
+        type            zeroGradient;
+    }
+
+    top
+    {
+        type            zeroGradient;
+    }
+
+    "(front|back)"
+    {
+        type            empty;
+    }
+}
+
+
+// ************************************************************************* //
