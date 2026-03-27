@@ -1,0 +1,6 @@
+# vtk DataFile Version 3.0
+Multiple ray data
+ASCII
+DATASET POLYDATA
+POINTS 0 float
+LINES 0 0

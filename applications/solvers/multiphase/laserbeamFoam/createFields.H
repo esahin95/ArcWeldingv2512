@@ -46,16 +46,17 @@ volScalarField T
 
 #include "createPhi.H"
 
+Info<< "Creating multiphaseSystem\n" << endl;
+autoPtr<multiphaseInter::multiphaseSystem> fluidPtr =
+    multiphaseInter::multiphaseSystem::New(mesh);
 
-Info<< "Reading transportProperties\n" << endl;
-immiscibleIncompressibleTwoPhaseMixture mixture(U, phi);
+multiphaseInter::multiphaseSystem& fluid = fluidPtr();
 
-volScalarField& alpha1(mixture.alpha1());
-volScalarField& alpha2(mixture.alpha2());
-
-const dimensionedScalar& rho1 = mixture.rho1();
-const dimensionedScalar& rho2 = mixture.rho2();
-
+if (!fluid.incompressible())
+{
+    FatalError << "One or more phases are not incompressible. " << nl
+        << "This is a incompressible solver." << abort(FatalError);
+}
 
 // Need to store rho for ddt(rho, U)
 volScalarField rho
@@ -67,10 +68,9 @@ volScalarField rho
         mesh,
         IOobject::READ_IF_PRESENT
     ),
-    alpha1*rho1 + alpha2*rho2
+    fluid.rho()
 );
 rho.oldTime();
-
 
 // Mass flux
 surfaceScalarField rhoPhi
@@ -86,22 +86,9 @@ surfaceScalarField rhoPhi
     fvc::interpolate(rho)*phi
 );
 
-
-IOdictionary transportProperties
-(
-    IOobject
-    (
-        "transportProperties",
-        runTime.constant(),
-        mesh,
-        IOobject::MUST_READ_IF_MODIFIED,
-        IOobject::NO_WRITE
-    )
-);
-
 const word interfaceTrackingScheme
 (
-    transportProperties.lookup("interfaceTrackingScheme")
+    fluid.lookup("interfaceTrackingScheme")
 );
 
 if
@@ -117,121 +104,78 @@ if
         << exit(FatalError);
 }
 
-dictionary& transportPropertiesMetal = transportProperties.subDict("metal");
-dictionary& transportPropertiesGas = transportProperties.subDict("gas");
+IOdictionary phaseChangeProperties
+(
+    IOobject
+    (
+        "transportProperties",
+        runTime.constant(),
+        mesh,
+        IOobject::MUST_READ_IF_MODIFIED,
+        IOobject::NO_WRITE
+    )
+);
 
+Info<< "Reading phase change properties for metal" << endl;
+dictionary& dict = phaseChangeProperties.subDict("metal");
 
-const dimensionedScalar Tsolidus1
+const dimensionedScalar Tsol
 (
     "Tsolidus",
     dimensionSet(0, 0, 0, 1, 0),
-    transportPropertiesMetal//.lookup("Tsolidus")
+    dict
 );
-// Info<<Tsolidus1<<endl;
-const dimensionedScalar Tsolidus2
-(
-    "Tsolidus",
-    dimensionSet(0, 0, 0, 1, 0),
-    transportPropertiesGas//.lookup("Tsolidus")
-);
-// Info<<Tsolidus2<<endl;
 
-const dimensionedScalar Tliquidus1
+const dimensionedScalar Tliq
 (
     "Tliquidus",
     dimensionSet(0, 0, 0, 1, 0),
-    transportPropertiesMetal//.lookup("Tliquidus")
+    dict
 );
 
-const dimensionedScalar Tliquidus2
-(
-    "Tliquidus",
-    dimensionSet(0, 0, 0, 1, 0),
-    transportPropertiesGas//.lookup("Tliquidus")
-);
-
-const dimensionedScalar LatentHeat1
+const dimensionedScalar Lmelt
 (
     "LatentHeat",
     dimensionSet(0, 2, -2, 0, 0),
-    transportPropertiesMetal//.lookup("LatentHeat")
+    dict
 );
 
-const dimensionedScalar LatentHeat2
-(
-    "LatentHeat",
-    dimensionSet(0, 2, -2, 0, 0),
-    transportPropertiesGas//.lookup("LatentHeat")
-);
-
-const dimensionedScalar beta1
-(
-    "beta",
-    dimensionSet(0, 0, 0, -1, 0),
-    transportPropertiesMetal//.lookup("beta")
-);
-
-const dimensionedScalar beta2
-(
-    "beta",
-    dimensionSet(0, 0, 0, -1, 0),
-    transportPropertiesGas//.lookup("beta")
-);
-
-const dimensionedScalar Marangoni_Constant
-(
-    "Marangoni_Constant",
-    dimensionSet(1, 0, -2, -1, 0),
-    transportProperties//.lookup("dsigmadT")
-);
+Info<< "Reading phase change properties for metal" << endl;
+dict = phaseChangeProperties.subDict("gas");
 
 const dimensionedScalar p0
 (
     "p0",
     dimensionSet(1, -1, -2, 0, 0, 0, 0),
-    transportProperties//.lookup("p0")
-); // atmospheric pressure
+    dict
+);
 
 const dimensionedScalar Tvap
 (
     "Tvap",
     dimensionSet(0, 0, 0, 1, 0),
-    transportProperties//.lookup("Tvap")
+    dict
 );
 
 const dimensionedScalar Mm
 (
     "Mm",
     dimensionSet(1, 0, 0, 0, -1),
-    transportProperties//.lookup("Mm")
+    dict
 );
 
-const dimensionedScalar LatentHeatVap
+const dimensionedScalar Lvap
 (
-    "LatentHeatVap",
+    "Lvap",
     dimensionSet(0, 2, -2, 0, 0),
-    transportProperties//.lookup("LatentHeatVap")
+    dict
 );
 
 const dimensionedScalar R
 (
     "R",
     dimensionSet(1, 2, -2, -1, -1, 0, 0),
-        8.314
-);
-
-volScalarField em
-(
-    IOobject
-    (
-        "em",                       
-        runTime.timeName(),         
-        mesh,                       
-        IOobject::NO_READ,          
-        IOobject::NO_WRITE          
-    ),
-    mesh,
-    dimensionedScalar("zero", dimless, 0.0) 
+    scalar(8.314)
 );
 
 const dimensionedScalar SB
@@ -239,74 +183,13 @@ const dimensionedScalar SB
     "SB",
     dimensionSet(1, 0, -3, -4, 0, 0, 0),
     scalar(5.67e-8)
-); // Stefan-Boltzmann Constant
-
-[[maybe_unused]]const scalar emL(readScalar(transportProperties.lookup("emL")));
-[[maybe_unused]]const scalar emS(readScalar(transportProperties.lookup("emS")));
-const dimensionedScalar TRef ("TRef",transportProperties);
-
-const Polynomial<8> polykappa_m(transportPropertiesMetal.lookup("poly_kappa"));
-const Polynomial<8> polykappa_g(transportPropertiesGas.lookup("poly_kappa"));
-
-const Polynomial<8> polycp_m(transportPropertiesMetal.lookup("poly_cp"));
-const Polynomial<8> polycp_g(transportPropertiesGas.lookup("poly_cp"));
-
-volScalarField cp
-(
-    IOobject
-    (
-        "cp",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::AUTO_WRITE//change to no write when working
-    ),
-    mesh,
-    dimensionedScalar("cp", dimensionSet(0, 2, -2, -1, 0), 0.0)
 );
 
-volScalarField kappa
+const dimensionedScalar T0 
 (
-    IOobject
-    (
-        "kappa",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::AUTO_WRITE//change to no write when working
-    ),
-    mesh,
-    dimensionedScalar("kappa",dimensionSet(1, 1, -3, -1, 0),0.0)
-);
-
-#include "updateKappaCp.H"
-
-
-volScalarField TSolidus
-(
-    IOobject
-    (
-        "TSolidus",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::AUTO_WRITE
-    ),
-    alpha1*Tsolidus1 + (1.0 - alpha1)*Tsolidus2
-);
-
-
-volScalarField TLiquidus
-(
-    IOobject
-    (
-        "TLiquidus",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::AUTO_WRITE
-    ),
-    alpha1*Tliquidus1 + (1.0 - alpha1)*Tliquidus2
+    "T0",
+    dimensionSet(dimTemperature),
+    dict
 );
 
 volScalarField DC
@@ -323,100 +206,17 @@ volScalarField DC
     dimensionedScalar("DC", dimensionSet(1,-3,-1,0,0), 1.0e14)
 );
 
-volScalarField metalaverage
+volScalarField alphaLiquid
 (
     IOobject
     (
-        "metalaverage",
-        runTime.timeName(),
-        mesh,
-        IOobject::READ_IF_PRESENT,
-        IOobject::NO_WRITE
-    ),
-    fvc::average(alpha1)
-);
-
-volScalarField epsilon1
-(
-    IOobject
-    (
-        "epsilon1",
+        "alphaLiquid",
         runTime.timeName(),
         mesh,
         IOobject::READ_IF_PRESENT,
         IOobject::AUTO_WRITE
     ),
     max(min((T - TSolidus)/(TLiquidus - TSolidus), 1.0), 0.0)
-);
-
-volVectorField n_filtered
-(
-    IOobject
-    (
-        "n_filtered",
-        runTime.timeName(),
-        mesh,
-        IOobject::READ_IF_PRESENT,
-        IOobject::NO_WRITE
-    ),
-    mesh,
-    dimensionedVector("n_filtered", dimless, vector::zero)//,
-    // zeroGradientFvPatchVectorField::typeName
-);
-
-volScalarField epsilon1mask
-(
-    IOobject
-    (
-        "epsilon1mask",
-        runTime.timeName(),
-        mesh,
-        IOobject::READ_IF_PRESENT,
-        IOobject::NO_WRITE
-    ),
-    mesh,
-    dimensionedScalar("epsilon1mask",dimless,0.0)
-);
-
-volScalarField epsilon1mask2
-(
-    IOobject
-    (
-        "epsilon1mask2",
-        runTime.timeName(),
-        mesh,
-        IOobject::READ_IF_PRESENT,
-        IOobject::NO_WRITE
-    ),
-    mesh,
-    dimensionedScalar("epsilon1mask2", dimless, 0.0)
-);
-
-volVectorField gradT
-(
-    IOobject
-    (
-        "gradT",
-        runTime.timeName(),
-        mesh,
-        IOobject::READ_IF_PRESENT,
-        IOobject::NO_WRITE
-    ),
-    mesh,
-    dimensionedVector("gradT", dimensionSet(0, -1, 0, 1, 0), vector::zero)
-);
-
-volScalarField LatentHeat
-(
-    IOobject
-    (
-        "LatentHeat",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::NO_WRITE
-    ),
-    alpha1*LatentHeat1 + (1.0 - alpha1)*LatentHeat2
 );
 
 volScalarField TRHS
@@ -445,61 +245,6 @@ volScalarField Tcorr
     ),
     mesh,
     dimensionedScalar("Tcorr", dimensionSet(0, 0, 0, 1, 0), 0.0)
-);
-
-volScalarField beta
-(
-    IOobject
-    (
-        "beta",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::NO_WRITE
-    ),
-    alpha1*beta1 + (1.0-alpha1)*beta2
-);
-
-volScalarField rhok
-(
-    IOobject
-    (
-        "rhok",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::NO_WRITE
-    ),
-    mesh,
-    dimensionedScalar("rhok", dimless, 0.0)
-);
-
-volScalarField Num_divU
-(
-    IOobject
-    (
-        "Num_divU",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::NO_WRITE
-    ),
-    mesh,
-    dimensionedScalar("Num_divU", dimensionSet(0,0,-1,0,0), 0.0)
-);
-
-volVectorField Marangoni
-(
-    IOobject
-    (
-        "Marangoni",
-        runTime.timeName(),
-        mesh,
-        IOobject::READ_IF_PRESENT,
-        IOobject::NO_WRITE
-    ),
-    mesh,
-    dimensionedVector("Marangoni", dimensionSet(1, -2, -2, 0, 0), vector::zero)
 );
 
 // Recoil Pressure
@@ -532,8 +277,7 @@ volScalarField Qv
     dimensionedScalar("0", dimensionSet(1,0,-3,0,0,0,0), 0.0)
 );
 
-
-volScalarField damper
+surfaceScalarField damper
 (
     IOobject
     (
@@ -543,12 +287,10 @@ volScalarField damper
         IOobject::NO_READ,
         IOobject::NO_WRITE
     ),
-    mesh,
-    dimensionedScalar("damper", dimless, 1.0),
-    zeroGradientFvPatchScalarField::typeName
+    fvc::interpolate(rho) * (2.0 / (rho1 + rho2))
 );
 
-volScalarField thermalDamper
+surfaceScalarField thermalDamper
 (
     IOobject
     (
@@ -558,42 +300,8 @@ volScalarField thermalDamper
         IOobject::NO_READ,
         IOobject::NO_WRITE
     ),
-    mesh,
-    dimensionedScalar("thermalDamper", dimless, 1.0),
-    zeroGradientFvPatchScalarField::typeName
+    damper
 );
-
-volScalarField alpha_filtered
-(
-    IOobject
-    (
-        "alpha_filtered",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::AUTO_WRITE
-    ),
-    mesh,
-    dimensionedScalar("alpha_filtered", dimensionSet(0, 0, 0, -0, 0), 0.0)
-);
-
-volScalarField alpha_smoothed
-(
-    IOobject
-    (
-        "alpha_smoothed",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::AUTO_WRITE
-    ),
-    mesh,
-    dimensionedScalar("alpha_smoothed", dimensionSet(0, 0, 0, -0, 0), 0.0)
-);
-
-// volVectorField gradepsilon1(fvc::grad(epsilon1));
-// volScalarField e1temp(fvc::average(epsilon1));
-// volScalarField e2temp(fvc::average(epsilon1mask));
 
 
 volScalarField e1temp
@@ -609,18 +317,19 @@ volScalarField e1temp
     mesh,
     dimensionedScalar("e1temp", dimensionSet(0, 0, 0, -0, 0), 0.0)
 );
-e1temp = fvc::average(epsilon1);
+e1temp = fvc::average(alphaLiquid);
 
-
+/*
 dimensionedScalar elec_resistivity_metal
 (
     "elec_resistivity",
     dimensionSet(1, 3, -3, 0, 0),
     transportPropertiesMetal//.lookup("elec_resistivity")
 );
-
+*/
 
 // Electrical resistivity of condensate only
+/*
 volScalarField electrical_resistivity
 (
     IOobject
@@ -634,6 +343,7 @@ volScalarField electrical_resistivity
     mesh,
     elec_resistivity_metal
 );
+*/
 
 volScalarField rhoCp
 (
@@ -645,132 +355,45 @@ volScalarField rhoCp
         IOobject::NO_READ,
         IOobject::NO_WRITE
     ),
-    mesh,
-    dimensionedScalar("rhoCp", dimensionSet(1, -1, -2, -1, 0), 0.0)
+    rho * fluid.Cp()
 );
-rhoCp = (rho*cp);
-// volScalarField rhoCp(rho*cp);
 rhoCp.oldTime();
 
-
-// surfaceScalarField rhophicp(fvc::interpolate(cp)*rhoPhi);
-
-surfaceScalarField rhophicp
+surfaceScalarField rhoPhiCp
 (
     IOobject
     (
-        "rhophicp",
+        "rhoPhiCp",
         runTime.timeName(),
         mesh,
         IOobject::NO_READ,
         IOobject::NO_WRITE
     ),
-    mesh,
-    dimensionedScalar("rhophicp", dimensionSet(1, 2, -3, -1, 0), 0.0)
-);
-rhophicp = fvc::interpolate(cp)*rhoPhi;
-
-
-
-
-
-
-
-
-
-
-
-const dimensionedScalar DarcyConstantlarge
-(
-    "DarcyConstantlarge", dimensionSet(1,-3,-1,0,0), 1.0e6
+    fvc::interpolate(fluid.Cp())*rhoPhi
 );
 
-const dimensionedScalar DarcyConstantsmall
+const dimensionedScalar DClarge
 (
-    "DarcyConstantsmall", dimless, 1.0e-12
+    "DClarge", dimensionSet(1,-3,-1,0,0), 1.0e6
 );
 
-
-
-// volVectorField gradAlpha(fvc::grad(alpha1));
-
-volVectorField gradAlpha
+const dimensionedScalar DCsmall
 (
-    IOobject
+    "DCsmall", dimless, 1.0e-12
+);
+
+// Construct incompressible turbulence model
+autoPtr
+<
+    CompressibleTurbulenceModel<multiphaseInter::multiphaseSystem>
+> turbulence
+(
+    CompressibleTurbulenceModel<multiphaseInter::multiphaseSystem>::New
     (
-        "gradAlpha",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::NO_WRITE
-    ),
-    mesh,
-    dimensionedVector("gradAlpha", dimensionSet(0, -1, 0, -0, 0), vector::zero)
-);
-gradAlpha = fvc::grad(alpha1);
-
-// volVectorField nHatM(gradAlpha/(mag(gradAlpha) + deltaN));
-
-
-volVectorField nHatM
-(
-    IOobject
-    (
-        "nHatM",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::NO_WRITE
-    ),
-    mesh,
-    dimensionedVector("nHatM", dimensionSet(0, 0, 0, -0, 0), vector::zero)
-);
-nHatM = gradAlpha/(mag(gradAlpha) + deltaN);
-
-
-// This variable is >=0 if the cell has been liquid
-volScalarField meltHistory
-(
-    IOobject
-    (
-        "meltHistory",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::AUTO_WRITE
-    ),
-    mesh,
-    dimensionedScalar("meltHistory", dimensionSet(0, 0, 0, -0, 0), 0.0)
-);
-
-// This variable is 1 if (alpha.metal >= 0.5 and epsilon1 >=0.5), 0 otherwise
-volScalarField condition
-(
-    IOobject
-    (
-        "condition",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::AUTO_WRITE
-    ),
-    mesh,
-    dimensionedScalar("condition", dimensionSet(0, 0, 0, -0, 0), 0.0)
-);
-
-
-
-
-typedef incompressibleInterPhaseTransportModel
-    <
-        immiscibleIncompressibleTwoPhaseMixture
-    > transportModelType;
-
-autoPtr<transportModelType> turbulence
-(
-    new transportModelType
-    (
-        rho, U, phi, rhoPhi, mixture
+        rho,
+        U,
+        rhoPhi,
+        fluid
     )
 );
 
@@ -779,25 +402,7 @@ autoPtr<transportModelType> turbulence
 #include "gh.H"
 
 // Create laser heat source
-laserHeatSource laser(mesh);
-
-#include "updateProps.H"
-
-// volScalarField depositionTemp
-// (
-//     IOobject
-//     (
-//         "depositionTemp",
-//         runTime.timeName(),
-//         mesh,
-//         IOobject::NO_READ,
-//         IOobject::NO_WRITE
-//     ),
-//     mesh,
-//     dimensionedScalar("depositionTemp", dimensionSet(1, -1, -2, -1, 0), 0.0),
-//     zeroGradientFvPatchScalarField::typeName
-// );
-
+//laserHeatSource laser(mesh);
 
 // depositionTemp=laser.deposition();
 // depositionTemp.correctBoundaryConditions();
@@ -812,7 +417,7 @@ volScalarField p
         IOobject::NO_READ,
         IOobject::AUTO_WRITE
     ),
-    p_rgh + rho*gh*rhok
+    p_rgh + rho*gh
 );
 
 label pRefCell = 0;
@@ -834,7 +439,7 @@ if (p_rgh.needReference())
         p.dimensions(),
         pRefValue - getRefCellValue(p, pRefCell)
     );
-    p_rgh = p - rho*gh*rhok;
+    p_rgh = p - rho*gh;
 }
 
 mesh.setFluxRequired(p_rgh.name());

@@ -14,3 +14,5 @@ wmake $targetType thermophysicalModels/radiation/radiationModels/laserDTRM
 wmake $targetType laserHeatSource
 
 wmake $targetType fvOptions/sources/derived/gaussianHeatSource
+
+wmake $targetType geometricVoF

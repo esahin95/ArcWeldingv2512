@@ -54,17 +54,13 @@ Authors
 #include "localEulerDdtScheme.H"
 #include "CrankNicolsonDdtScheme.H"
 #include "subCycle.H"
-#include "immiscibleIncompressibleTwoPhaseMixture.H"
-#include "incompressibleInterPhaseTransportModel.H"
-#include "turbulentTransportModel.H"
+#include "multiphaseSystem.H"
+#include "turbulentFluidThermoModel.H"
 #include "pimpleControl.H"
 #include "fvOptions.H"
 #include "CorrectPhi.H"
 #include "fvcSmooth.H"
 #include "dynamicRefineFvMesh.H"
-
-#include "Polynomial.H"
-#include "laserHeatSource.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -113,57 +109,21 @@ int main(int argc, char *argv[])
         #include "readControls.H"
         #include "readDyMControls.H"
 
-        if (interfaceTrackingScheme == "MULES")
-        {
-            if (LTS)
-            {
-                #include "MULES/setRDeltaT.H"
-            }
-            else
-            {
-                #include "MULES/CourantNo.H"
-                #include "MULES/alphaCourantNo.H"
-                #include "MULES/setDeltaT.H"
-            }
-        }
-        else if (interfaceTrackingScheme == "isoAdvector")
-        {
-            #include "isoAdvector/porousCourantNo.H"
-            #include "isoAdvector/porousAlphaCourantNo.H"
-            #include "isoAdvector/setDeltaT.H"
-        }
+        #include "CourantNo.H"
+        #include "alphaCourantNo.H"
+        #include "setDeltaT.H"
 
         ++runTime;
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
+        fluid.correctMassSources(T);
+        fluid.solve();
+        rho = fluid.rho();
+
         // --- Pressure-velocity PIMPLE corrector loop
         while (pimple.loop())
         {
-
-            if (interfaceTrackingScheme == "MULES")
-            {
-                #include "MULES/firstIter.H"
-                #include "MULES/alphaControls.H"
-                #include "MULES/alphaEqnSubCycle.H"
-            }
-            else if (interfaceTrackingScheme == "isoAdvector")
-            {
-                #include "isoAdvector/firstIter.H"
-                #include "isoAdvector/alphaControls.H"
-                #include "isoAdvector/alphaEqnSubCycle.H"
-            }
-
-            #include "updateProps.H"
-
-            // Update the laser deposition field
-            laser.updateDeposition
-            (
-                alpha_filtered, n_filtered, electrical_resistivity
-            );
-
-            mixture.correct();
-
             if (pimple.frozenFlow())
             {
                 continue;
@@ -184,20 +144,7 @@ int main(int argc, char *argv[])
             }
         }
 
-        // Update the melt history
-        const volScalarField& alphaMetal =
-            mesh.lookupObject<volScalarField>("alpha.metal");
-        condition = pos(alphaMetal - 0.5) * pos(epsilon1 - 0.5);
-        meltHistory += condition;
-
         runTime.write();
-
-        // Write ray paths to VTK files
-        if (runTime.outputTime())
-        {
-            laser.writeRayPathsToVTK();
-            laser.writeRayPathVTKSeriesFile();
-        }
 
         runTime.printExecutionTime(Info);
     }

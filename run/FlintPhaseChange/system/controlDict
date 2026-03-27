@@ -21,14 +21,15 @@ startFrom       latestTime;
 startTime       0;
 
 stopAt          endTime;
+stopAt          nextWrite;
 
-endTime         0.05;
+endTime         5.0;
 
 deltaT          1e-5;
 
 writeControl    adjustable;
 
-writeInterval   0.005;
+writeInterval   0.05;
 
 purgeWrite      0;
 
@@ -46,7 +47,7 @@ runTimeModifiable yes;
 
 adjustTimeStep  yes;
 
-maxDeltaT       1;
+maxDeltaT       5e-5;
 
 maxCo           0.25;
 
@@ -56,12 +57,13 @@ maxAlphaDdt     2.3; // Check this
 
 maxDi           25; // Check this
 
+
+// ************************************************************************* //
+
 OptimisationSwitches
 {
     fileHandler collated;
 }
-
-// ************************************************************************* //
 
 functions
 {
@@ -87,7 +89,7 @@ functions
 
         log             true;
 
-        writeControl    writeTime;
+        writeControl    timeStep;
 
         mode       magnitude;
 

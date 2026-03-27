@@ -2,7 +2,7 @@
     TSolidus = alpha1*Tsolidus1 + (1.0 - alpha1)*Tsolidus2;
     TLiquidus = alpha1*Tliquidus1 + (1.0 - alpha1)*Tliquidus2;
     beta = alpha1*beta1 + (1.0 - alpha1)*beta2;
-    rhok = (1.0 - max(epsilon1*(beta)*(T - TSolidus), 0.0));
+    rhok = (1.0 - max(alphaLiquid*(beta)*(T - TSolidus), 0.0));
 
     scalarField& alpha1I = alpha1;
     scalarField& TSolidusI = TSolidus;
@@ -110,57 +110,57 @@
     LatentHeat =
         alpha_filtered*LatentHeat1 + (1.0 - alpha_filtered)*LatentHeat2;
 
-    // gradepsilon1 = fvc::grad(epsilon1);
-    // gradepsilon1.correctBoundaryConditions();
+    // gradalphaLiquid = fvc::grad(alphaLiquid);
+    // gradalphaLiquid.correctBoundaryConditions();
 
     {
         const volVectorField gradAlphaFiltered(fvc::grad(alpha_filtered));
         n_filtered = gradAlphaFiltered/(mag(gradAlphaFiltered) + deltaN);
     }
 
-    e1temp = fvc::average(epsilon1);
+    e1temp = fvc::average(alphaLiquid);
 
     const scalarField& e1tempI = e1temp;
-    const scalarField& epsilon1I = epsilon1;
-    scalarField& epsilon1maskI = epsilon1mask;
+    const scalarField& alphaLiquidI = alphaLiquid;
+    scalarField& alphaLiquidmaskI = alphaLiquidmask;
     forAll(CI, celli)
     {
         if (e1tempI[celli] <= 0.95)
         {
-            epsilon1maskI[celli] = 0.0;
+            alphaLiquidmaskI[celli] = 0.0;
         }
         else
         {
-            epsilon1maskI[celli] = epsilon1I[celli];
+            alphaLiquidmaskI[celli] = alphaLiquidI[celli];
         }
     }
 
-    epsilon1mask.correctBoundaryConditions();
+    alphaLiquidmask.correctBoundaryConditions();
 
-    // e2temp = fvc::average(epsilon1mask);
-    // epsilon1mask2 *= 0.0;
+    // e2temp = fvc::average(alphaLiquidmask);
+    // alphaLiquidmask2 *= 0.0;
 
     // const scalarField& e2tempI = e2temp;
-    // scalarField& epsilon1mask2I = epsilon1mask2;
+    // scalarField& alphaLiquidmask2I = alphaLiquidmask2;
     // forAll(CI, celli)
     // {
     //     if (e2tempI[celli] <= 0.95)
     //     {
-    //         epsilon1mask2I[celli] = 0.0;
+    //         alphaLiquidmask2I[celli] = 0.0;
     //     }
     //     else
     //     {
-    //         epsilon1mask2I[celli] = epsilon1maskI[celli];
+    //         alphaLiquidmask2I[celli] = alphaLiquidmaskI[celli];
     //     }
 
     // }
 
-    // epsilon1mask2.correctBoundaryConditions();
+    // alphaLiquidmask2.correctBoundaryConditions();
 
     if (laser.powderSim())
     {
-        gh = epsilon1mask*(g & mesh.C());
-        ghf = fvc::interpolate(epsilon1mask)*(g & mesh.Cf());
+        gh = alphaLiquidmask*(g & mesh.C());
+        ghf = fvc::interpolate(alphaLiquidmask)*(g & mesh.Cf());
     }
     else{
         gh = (g & mesh.C());
