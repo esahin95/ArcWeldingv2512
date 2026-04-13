@@ -1,6 +1,6 @@
 {
-    TSolidus = alpha1*Tsolidus1 + (1.0 - alpha1)*Tsolidus2;
-    TLiquidus = alpha1*Tliquidus1 + (1.0 - alpha1)*Tliquidus2;
+    //TSolidus = alpha1*Tsolidus1 + (1.0 - alpha1)*Tsolidus2;
+    //TLiquidus = alpha1*Tliquidus1 + (1.0 - alpha1)*Tliquidus2;
     beta = alpha1*beta1 + (1.0 - alpha1)*beta2;
     rhok = (1.0 - max(epsilon1*(beta)*(T - TSolidus), 0.0));
 
@@ -26,6 +26,7 @@
     #include "updateKappaCp.H"
 
     // Update the cell size fields
+    /*
     const faceList & ff = mesh.faces();
     const pointField & pp = mesh.points();
     const vectorField& CI = mesh.C();
@@ -54,7 +55,6 @@
     alpha_filtered = volScalarField("alpha_filtered", alpha1);
     alpha_filtered.correctBoundaryConditions();
     scalarField& alpha_filteredI = alpha_filtered;
-    // alpha_filteredI.correctBoundaryConditions();
     forAll(CI, celli)
     {
         if (alpha1I[celli] > 0.99)
@@ -106,13 +106,15 @@
     alpha_filtered.correctBoundaryConditions();
 
     alpha_smoothed = fvc::average(alpha1);
-
+    */
+    /*
     LatentHeat =
         alpha_filtered*LatentHeat1 + (1.0 - alpha_filtered)*LatentHeat2;
+    */
+   
+   LatentHeat = alpha1*LatentHeat1 + (1.0 - alpha1)*LatentHeat2;
 
-    // gradepsilon1 = fvc::grad(epsilon1);
-    // gradepsilon1.correctBoundaryConditions();
-
+    /*
     {
         const volVectorField gradAlphaFiltered(fvc::grad(alpha_filtered));
         n_filtered = gradAlphaFiltered/(mag(gradAlphaFiltered) + deltaN);
@@ -136,27 +138,8 @@
     }
 
     epsilon1mask.correctBoundaryConditions();
-
-    // e2temp = fvc::average(epsilon1mask);
-    // epsilon1mask2 *= 0.0;
-
-    // const scalarField& e2tempI = e2temp;
-    // scalarField& epsilon1mask2I = epsilon1mask2;
-    // forAll(CI, celli)
-    // {
-    //     if (e2tempI[celli] <= 0.95)
-    //     {
-    //         epsilon1mask2I[celli] = 0.0;
-    //     }
-    //     else
-    //     {
-    //         epsilon1mask2I[celli] = epsilon1maskI[celli];
-    //     }
-
-    // }
-
-    // epsilon1mask2.correctBoundaryConditions();
-
+    */
+    /*
     if (laser.powderSim())
     {
         gh = epsilon1mask*(g & mesh.C());
@@ -166,4 +149,7 @@
         gh = (g & mesh.C());
         ghf = (g & mesh.Cf());
     }
+    */
+    gh = (g & mesh.C());
+    ghf = (g & mesh.Cf());
 }

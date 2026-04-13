@@ -1,6 +1,6 @@
 MRF.correctBoundaryVelocity(U);
 
-
+/*
 if (laser.powderSim())
 {
     DC =
@@ -13,6 +13,10 @@ else
         DarcyConstantlarge*Foam::pow((1.0 - epsilon1), 2)
        /(Foam::pow(epsilon1, 3) + DarcyConstantsmall);
 }
+*/
+DC =
+    DarcyConstantlarge*Foam::pow((1.0 - epsilon1), 2)
+    /(Foam::pow(epsilon1, 3) + DarcyConstantsmall);
 
 DC.correctBoundaryConditions();  // ADDED
 
@@ -45,8 +49,10 @@ if (damperSwitch)
     damper.correctBoundaryConditions();  // ADDED
 }
 
+/*
 pVap = 0.54*p0*Foam::exp(LatentHeatVap*Mm*((T - Tvap)/(R*T*Tvap)));
 pVap.correctBoundaryConditions();  // ADDED
+*/
 
 /*
 fvVectorMatrix UEqn

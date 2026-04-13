@@ -157,10 +157,12 @@ int main(int argc, char *argv[])
             #include "updateProps.H"
 
             // Update the laser deposition field
+            /*
             laser.updateDeposition
             (
                 alpha_filtered, n_filtered, electrical_resistivity
             );
+            */
 
             mixture.correct();
 
@@ -185,19 +187,23 @@ int main(int argc, char *argv[])
         }
 
         // Update the melt history
+        /*
         const volScalarField& alphaMetal =
             mesh.lookupObject<volScalarField>("alpha.metal");
         condition = pos(alphaMetal - 0.5) * pos(epsilon1 - 0.5);
         meltHistory += condition;
+        */
 
         runTime.write();
 
         // Write ray paths to VTK files
+        /*
         if (runTime.outputTime())
         {
             laser.writeRayPathsToVTK();
             laser.writeRayPathVTKSeriesFile();
         }
+        */
 
         runTime.printExecutionTime(Info);
     }

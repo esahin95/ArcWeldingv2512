@@ -5,14 +5,14 @@
     scalar meanResidual = 1.0;
     //scalar Tresidual = 1.0;
 
-    TRHS *= 0.0;
+    //TRHS *= 0.0;
 
     rhoCp = rho*cp;
     rhoCp.correctBoundaryConditions();  
     
     rhophicp = fvc::interpolate(cp)*rhoPhi;
 
-    em = (epsilon1*emL) + ((1.0 - epsilon1)*emS);
+    //em = (epsilon1*emL) + ((1.0 - epsilon1)*emS);
 
     // const volTensorField gradU(fvc::grad(U));
     // volTensorField tau
@@ -25,6 +25,8 @@
     {
         epsilon1.storePrevIter();
         T.storePrevIter();
+
+        /*
         TRHS =
             LatentHeat*((fvc::ddt(rho, epsilon1) + fvc::div(rhoPhi, epsilon1)));
         
@@ -59,7 +61,8 @@
         }
 
         const volScalarField gradAlphaDamper (mag(gradAlpha)*thermalDamper);
-        
+        */
+
         /*
         fvScalarMatrix TEqn
         (
@@ -85,8 +88,7 @@
           - fvm::Sp(fvc::ddt(rhoCp) + fvc::div(rhophicp), T)
           - fvm::laplacian(kappa, T)
          ==
-            laser.deposition()
-          - TRHS
+          - LatentHeat*((fvc::ddt(rho, epsilon1) + fvc::div(rhoPhi, epsilon1)))
         );
 
         TEqn.relax();

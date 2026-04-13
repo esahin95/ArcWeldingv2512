@@ -8,6 +8,8 @@
     { "name": "rays_laser0_0.25.vtk", "time": 0.25 },
     { "name": "rays_laser0_0.3.vtk", "time": 0.3 },
     { "name": "rays_laser0_0.35.vtk", "time": 0.35 },
-    { "name": "rays_laser0_0.4.vtk", "time": 0.4 }
+    { "name": "rays_laser0_0.4.vtk", "time": 0.4 },
+    { "name": "rays_laser0_0.45.vtk", "time": 0.45 },
+    { "name": "rays_laser0_0.5.vtk", "time": 0.5 }
   ]
 }

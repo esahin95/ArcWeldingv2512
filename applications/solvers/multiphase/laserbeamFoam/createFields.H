@@ -220,6 +220,7 @@ const dimensionedScalar R
         8.314
 );
 
+/*
 volScalarField em
 (
     IOobject
@@ -233,6 +234,7 @@ volScalarField em
     mesh,
     dimensionedScalar("zero", dimless, 0.0) 
 );
+*/
 
 const dimensionedScalar SB
 (
@@ -281,7 +283,6 @@ volScalarField kappa
 
 #include "updateKappaCp.H"
 
-
 volScalarField TSolidus
 (
     IOobject
@@ -294,7 +295,6 @@ volScalarField TSolidus
     ),
     alpha1*Tsolidus1 + (1.0 - alpha1)*Tsolidus2
 );
-
 
 volScalarField TLiquidus
 (
@@ -322,7 +322,7 @@ volScalarField DC
     mesh,
     dimensionedScalar("DC", dimensionSet(1,-3,-1,0,0), 1.0e14)
 );
-
+/*
 volScalarField metalaverage
 (
     IOobject
@@ -336,6 +336,8 @@ volScalarField metalaverage
     fvc::average(alpha1)
 );
 
+*/
+
 volScalarField epsilon1
 (
     IOobject
@@ -348,6 +350,8 @@ volScalarField epsilon1
     ),
     max(min((T - TSolidus)/(TLiquidus - TSolidus), 1.0), 0.0)
 );
+
+/*
 
 volVectorField n_filtered
 (
@@ -392,6 +396,8 @@ volScalarField epsilon1mask2
     dimensionedScalar("epsilon1mask2", dimless, 0.0)
 );
 
+*/
+
 volVectorField gradT
 (
     IOobject
@@ -419,6 +425,7 @@ volScalarField LatentHeat
     alpha1*LatentHeat1 + (1.0 - alpha1)*LatentHeat2
 );
 
+/*
 volScalarField TRHS
 (
     IOobject
@@ -432,6 +439,8 @@ volScalarField TRHS
     mesh,
     dimensionedScalar("TRHS", dimensionSet(1, -1, -3, 0, 0), 0.0)
 );
+
+*/
 
 volScalarField Tcorr
 (
@@ -473,7 +482,7 @@ volScalarField rhok
     mesh,
     dimensionedScalar("rhok", dimless, 0.0)
 );
-
+/*
 volScalarField Num_divU
 (
     IOobject
@@ -488,6 +497,8 @@ volScalarField Num_divU
     dimensionedScalar("Num_divU", dimensionSet(0,0,-1,0,0), 0.0)
 );
 
+*/
+
 volVectorField Marangoni
 (
     IOobject
@@ -501,6 +512,8 @@ volVectorField Marangoni
     mesh,
     dimensionedVector("Marangoni", dimensionSet(1, -2, -2, 0, 0), vector::zero)
 );
+
+/*
 
 // Recoil Pressure
 volScalarField pVap
@@ -531,7 +544,7 @@ volScalarField Qv
     mesh,
     dimensionedScalar("0", dimensionSet(1,0,-3,0,0,0,0), 0.0)
 );
-
+*/
 
 volScalarField damper
 (
@@ -563,6 +576,7 @@ volScalarField thermalDamper
     zeroGradientFvPatchScalarField::typeName
 );
 
+/*
 volScalarField alpha_filtered
 (
     IOobject
@@ -634,6 +648,8 @@ volScalarField electrical_resistivity
     mesh,
     elec_resistivity_metal
 );
+
+*/
 
 volScalarField rhoCp
 (
@@ -727,7 +743,7 @@ volVectorField nHatM
 );
 nHatM = gradAlpha/(mag(gradAlpha) + deltaN);
 
-
+/*
 // This variable is >=0 if the cell has been liquid
 volScalarField meltHistory
 (
@@ -758,7 +774,7 @@ volScalarField condition
     dimensionedScalar("condition", dimensionSet(0, 0, 0, -0, 0), 0.0)
 );
 
-
+*/
 
 
 typedef incompressibleInterPhaseTransportModel
