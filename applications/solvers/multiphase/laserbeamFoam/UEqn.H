@@ -14,10 +14,8 @@ else
        /(Foam::pow(epsilon1, 3) + DarcyConstantsmall);
 }
 */
-DC =
-    DarcyConstantlarge*Foam::pow((1.0 - epsilon1), 2)
-    /(Foam::pow(epsilon1, 3) + DarcyConstantsmall);
-
+//DC = DClarge*Foam::sqr(1.0 - epsilon1) / (Foam::pow3(epsilon1) + DCsmall);
+DC = DClarge*Foam::sqr(alphaSolid) / (Foam::pow3(1-alphaSolid) + DCsmall);
 DC.correctBoundaryConditions();  // ADDED
 
 gradAlpha = fvc::grad(alpha1);

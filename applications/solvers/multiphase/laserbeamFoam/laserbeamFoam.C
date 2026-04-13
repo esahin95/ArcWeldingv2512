@@ -64,7 +64,7 @@ Authors
 #include "dynamicRefineFvMesh.H"
 
 #include "Polynomial.H"
-#include "laserHeatSource.H"
+//#include "laserHeatSource.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
