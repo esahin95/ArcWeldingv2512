@@ -1,0 +1,13 @@
+{
+  "file-series-version": "1.0",
+  "files": [
+    { "name": "rays_laser0_0.05.vtk", "time": 0.05 },
+    { "name": "rays_laser0_0.1.vtk", "time": 0.1 },
+    { "name": "rays_laser0_0.15.vtk", "time": 0.15 },
+    { "name": "rays_laser0_0.2.vtk", "time": 0.2 },
+    { "name": "rays_laser0_0.25.vtk", "time": 0.25 },
+    { "name": "rays_laser0_0.3.vtk", "time": 0.3 },
+    { "name": "rays_laser0_0.35.vtk", "time": 0.35 },
+    { "name": "rays_laser0_0.4.vtk", "time": 0.4 }
+  ]
+}

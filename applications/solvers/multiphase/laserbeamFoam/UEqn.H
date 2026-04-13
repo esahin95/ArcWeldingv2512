@@ -48,40 +48,71 @@ if (damperSwitch)
 pVap = 0.54*p0*Foam::exp(LatentHeatVap*Mm*((T - Tvap)/(R*T*Tvap)));
 pVap.correctBoundaryConditions();  // ADDED
 
+/*
+fvVectorMatrix UEqn
+(
+    fvm::ddt(rho, U) + fvm::div(rhoPhi, U)
+    + MRF.DDt(rho, U)
+    + turbulence->divDevRhoReff(rho, U)
+    + fvm::Sp(DC, U)
+    - Marangoni*damper
+    ==
+    fvOptions(rho, U)
+);
+*/
 
-    fvVectorMatrix UEqn
+// Reduced momentum equation
+fvVectorMatrix UEqn
+(
+    fvm::ddt(rho, U) + fvm::div(rhoPhi, U)
+    + MRF.DDt(rho, U)
+    + turbulence->divDevRhoReff(rho, U)
+    + fvm::Sp(DC, U)
+    - Marangoni*damper
+    ==
+    fvOptions(rho, U)
+);
+
+UEqn.relax();
+
+fvOptions.constrain(UEqn);
+
+if (pimple.momentumPredictor())
+{
+    
+    /*
+    solve
     (
-        fvm::ddt(rho, U) + fvm::div(rhoPhi, U)
-      + MRF.DDt(rho, U)
-      + turbulence->divDevRhoReff(rho, U)
-      + fvm::Sp(DC, U)
-      - Marangoni*damper
-     ==
-        fvOptions(rho, U)
+        UEqn
+        ==
+        fvc::reconstruct
+        (
+            (
+                mixture.surfaceTensionForce()*fvc::interpolate(damper)
+                + (fvc::interpolate(pVap)
+                    *fvc::snGrad(alpha1)
+                    *fvc::interpolate(damper))
+                - ghf*fvc::snGrad(rho*rhok)
+                - fvc::snGrad(p_rgh)
+            ) * mesh.magSf()
+        )
+    );
+    */
+
+    // Reduced fluxes
+    solve
+    (
+        UEqn
+        ==
+        fvc::reconstruct
+        (
+            (
+                mixture.surfaceTensionForce()
+                - ghf*fvc::snGrad(rho)
+                - fvc::snGrad(p_rgh)
+            ) * mesh.magSf()
+        )
     );
 
-    UEqn.relax();
-
-    fvOptions.constrain(UEqn);
-
-    if (pimple.momentumPredictor())
-    {
-        solve
-        (
-            UEqn
-         ==
-            fvc::reconstruct
-            (
-                (
-                    mixture.surfaceTensionForce()*fvc::interpolate(damper)
-                    + (fvc::interpolate(pVap)
-                        *fvc::snGrad(alpha1)
-                        *fvc::interpolate(damper))
-                  - ghf*fvc::snGrad(rho*rhok)
-                  - fvc::snGrad(p_rgh)
-                ) * mesh.magSf()
-            )
-        );
-
-        fvOptions.correct(U);
-    }
+    fvOptions.correct(U);
+}

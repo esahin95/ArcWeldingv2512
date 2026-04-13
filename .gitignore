@@ -19,5 +19,6 @@ log.*
 
 # match results directory and files
 results
+VTKs
 *.png
 *.obj

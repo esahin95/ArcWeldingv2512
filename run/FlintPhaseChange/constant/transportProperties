@@ -1,0 +1,61 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  10
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      phaseProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// Interface tracking method: isoAdvector or MULES
+interfaceTrackingScheme MULES;
+
+phases          (metal gas);
+
+// phase properties for the metal and gas phases
+metal
+{
+    transportModel      Newtonian;
+    nu                  1.6359918200408998e-07;
+    rho                 9780;
+    Tsolidus            544;
+    Tliquidus           545;
+    LatentHeat          44700;
+    beta                1.34e-5;
+    poly_kappa          (10.35 0.0 0 0 0 0 0 0);
+    poly_cp             (123 0.0 0 0 0 0 0 0);
+    elec_resistivity    1.0e-6; 
+}
+
+gas
+{
+    transportModel      Newtonian;
+    nu                  1.3833629185284937e-05;
+    rho                 1.6337;
+    Tsolidus            1.0;
+    Tliquidus           10.0;
+    LatentHeat          1;
+    beta                0;
+    poly_kappa          (0.0177 0.0 0 0 0 0 0 0);
+    poly_cp             (520 0.0 0 0 0 0 0 0);
+}
+
+// phase change properties
+sigma                   0.365;
+Marangoni_Constant	    -0.7e-4;
+p0		                0.0;
+Tvap                    3068.0;
+Mm                      5.58e-2;
+LatentHeatVap           1;
+emS                     0.4;
+emL                     0.1;
+TRef                    TRef [0 0 0 1 0 0 0]   540.55;
+
+// ************************************************************************* //

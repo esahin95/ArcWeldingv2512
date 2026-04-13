@@ -60,6 +60,7 @@
 
         const volScalarField gradAlphaDamper (mag(gradAlpha)*thermalDamper);
         
+        /*
         fvScalarMatrix TEqn
         (
             fvm::ddt(rhoCp,T)
@@ -72,6 +73,19 @@
             laser.deposition()
           - Qv*mag(gradAlpha)*thermalDamper
           + (Qrad_expl - Qv)*gradAlphaDamper
+          - TRHS
+        );
+        */
+
+        // Reduced temperature equation
+        fvScalarMatrix TEqn
+        (
+            fvm::ddt(rhoCp,T)
+          + fvm::div(rhophicp, T)
+          - fvm::Sp(fvc::ddt(rhoCp) + fvc::div(rhophicp), T)
+          - fvm::laplacian(kappa, T)
+         ==
+            laser.deposition()
           - TRHS
         );
 
