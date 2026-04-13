@@ -12,3 +12,7 @@ wmake $targetType phaseSystemModels/multiphaseInter/phasesSystem
 wmake $targetType thermophysicalModels/radiation/radiationModels/laserDTRM
 
 wmake $targetType fvOptions/sources/derived/gaussianHeatSource
+
+wmake $targetType laserHeatSource
+
+wmake $targetType geometricVoF

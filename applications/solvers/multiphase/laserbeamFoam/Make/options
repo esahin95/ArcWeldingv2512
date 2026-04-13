@@ -1,5 +1,5 @@
 EXE_INC = \
-    -I../../../src/laserHeatSource/lnInclude \
+    -I$(WM_PROJECT_USER_DIR)/src/laserHeatSource/lnInclude \
     -I$(LIB_SRC)/phaseSystemModels/twoPhaseInter/incompressibleInterPhaseTransportModel/lnInclude \
     -I$(LIB_SRC)/phaseSystemModels/twoPhaseInter/VoFphaseIncompressibleTurbulenceModels/lnInclude \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
