@@ -1,4 +1,5 @@
 {
+    /*
     TSolidus = alpha1*Tsolidus1 + (1.0 - alpha1)*Tsolidus2;
     TLiquidus = alpha1*Tliquidus1 + (1.0 - alpha1)*Tliquidus2;
     //beta = alpha1*beta1 + (1.0 - alpha1)*beta2;
@@ -23,10 +24,11 @@
     //beta.correctBoundaryConditions();  // ADDED
     //rhok.correctBoundaryConditions();  // ADDED
 
-    #include "updateKappaCp.H"
-
     LatentHeat = alpha1*LatentHeat1 + (1.0 - alpha1)*LatentHeat2;
     LatentHeat.correctBoundaryConditions();
+    */
+
+    #include "updateKappaCp.H"
 
     gh = (g & mesh.C());
     ghf = (g & mesh.Cf());

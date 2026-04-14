@@ -217,7 +217,7 @@ volScalarField kappa
 );
 
 #include "updateKappaCp.H"
-
+/*
 volScalarField TSolidus
 (
     IOobject
@@ -243,7 +243,7 @@ volScalarField TLiquidus
     ),
     alpha1*Tliquidus1 + (1.0 - alpha1)*Tliquidus2
 );
-
+*/
 volScalarField DC
 (
     IOobject
@@ -257,7 +257,7 @@ volScalarField DC
     mesh,
     dimensionedScalar("DC", dimensionSet(1,-3,-1,0,0), 1.0e14)
 );
-
+/*
 volScalarField epsilon1
 (
     IOobject
@@ -270,7 +270,7 @@ volScalarField epsilon1
     ),
     max(min((T - TSolidus)/(TLiquidus - TSolidus), 1.0), 0.0)
 );
-
+*/
 volScalarField alphaSolid
 (
     IOobject
@@ -325,7 +325,7 @@ volVectorField gradT
     mesh,
     dimensionedVector("gradT", dimensionSet(0, -1, 0, 1, 0), vector::zero)
 );
-
+/*
 volScalarField LatentHeat
 (
     IOobject
@@ -338,7 +338,7 @@ volScalarField LatentHeat
     ),
     alpha1*LatentHeat1 + (1.0 - alpha1)*LatentHeat2
 );
-
+*/
 volScalarField Tcorr
 (
     IOobject

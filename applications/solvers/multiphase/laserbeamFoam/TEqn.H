@@ -1,6 +1,6 @@
 {
     int iter = 0;
-    scalarField residual(epsilon1.primitiveField().size(), 1.0);
+    scalarField residual(alphaSolid.primitiveField().size(), 1.0);
     scalar maxResidual = 1.0;
     scalar meanResidual = 1.0;
 
@@ -11,9 +11,9 @@
 
     do
     {
-        epsilon1.storePrevIter();
+        //epsilon1.storePrevIter();
         alphaSolid.storePrevIter();
-        T.storePrevIter();
+        //T.storePrevIter();
 
         /*
         fvScalarMatrix TEqn
@@ -67,28 +67,23 @@
         */
 
         Tcorr = Tliquidus1 - solidFraction1 * (Tliquidus1 - Tsolidus1);
-        Tcorr.correctBoundaryConditions();  
-
-        solidFraction1 = max
-        (
-            min
+        //Tcorr.correctBoundaryConditions(); 
+        solidFraction1 = 
+            max
             (
-                solidFraction1 + epsilonRel*cp/LatentHeat1*(Tcorr - T),
-                1.0
-            ),
-            0.0
-        );
-        alphaSolid = max(min(alpha1 * solidFraction1, 1.0), 0.0);
+                min
+                (
+                    solidFraction1 + epsilonRel * cp / LatentHeat1 * (Tcorr - T),
+                    1.0
+                ),
+                0.0
+            );
+        alphaSolid = clamp(alpha1, zero_one{}) * solidFraction1;
         alphaSolid.correctBoundaryConditions(); 
-        
-        //alphaSolid = max(min((Tliquidus1 - T)/(Tliquidus1-Tsolidus1), alpha1), 0.0);
-        //alphaSolid = alphaSolid.prevIter()*(1-epsilonRel) + alphaSolid*epsilonRel;
-        //alphaSolid.correctBoundaryConditions();
 
-
+        /*
         Tcorr = (TLiquidus - TSolidus)*epsilon1 + TSolidus;
         Tcorr.correctBoundaryConditions();  
-
         epsilon1 =
             max
             (
@@ -115,6 +110,7 @@
         Info<< "Correcting epsilon1, mean residual = " << meanResidual
             << ", max residual = " << maxResidual
             << endl;
+        */
 
         residual =
             mag
