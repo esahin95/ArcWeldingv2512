@@ -284,6 +284,19 @@ volScalarField alphaSolid
     max(min(alpha1 * (Tliquidus1 - T)/(Tliquidus1-Tsolidus1), alpha1), 0.0)
 );
 
+volScalarField solidFraction1
+(
+    IOobject
+    (
+        "solidFraction1",
+        runTime.timeName(),
+        mesh,
+        IOobject::READ_IF_PRESENT,
+        IOobject::AUTO_WRITE
+    ),
+    max(min((Tliquidus1 - T)/(Tliquidus1-Tsolidus1), 1.0), 0.0)
+);
+
 /*
 volScalarField alphaLiquid
 (

@@ -76,6 +76,7 @@ solvers
         smoother        symGaussSeidel;
         tolerance       1e-9;
         relTol          0.0;
+        minIter         5;
     }
 
     TFinal
@@ -87,9 +88,9 @@ solvers
 MELTING
 {
     minTempCorrector 1;
-    maxTempCorrector 20;
+    maxTempCorrector 50;
     epsilonTolerance 1e-6;
-    epsilonRelaxation 0.9;
+    epsilonRelaxation 1.0;
     
     damperSwitch true;
 }
